@@ -32,24 +32,21 @@ class Othello:
     def run_game(self):
         self.draw_initial_board()
         self.turn = "player"
-        
+
         """Start the main loop for the game."""
         while True:
-            if self.turn == "player":
-                if self.check_for_events():
-                    self.get_player_move()
             #Watch for mouse events
-            # if self.turn == "player":
-            #    if self.check_for_events():
-            #        self.get_player_move()
-            #        self.check_win()
-            #        self.turn = "computer"
-            # elif self.turn == "computer":
-            #     self.get_computer_move()
-            #     self.check_win()
-            #     self.turn = "player"
-        
-        pygame.display.flip()
+            if self.turn == "player":
+               if self.check_for_events():
+                   self.get_player_move()
+                   self.check_win()
+                   self.turn = "computer"
+            elif self.turn == "computer":
+                self.get_computer_move()
+                self.check_win()
+                self.turn = "player"
+
+            pygame.display.flip()
 
     """Given a board and a player, it will iterate through the board and return the score of said board"""
     def get_player_score(self, board, tile):
@@ -76,7 +73,7 @@ class Othello:
 
         #Get the highest scoring move
         best_score = -1
-       
+
         for x, y in valid_moves:
             board_copy = self.get_board_copy(self.board)
             self.make_move(board_copy, "computer", x, y)
@@ -88,7 +85,7 @@ class Othello:
                 bestx = x
                 besty = y
         return [bestx, besty]
-    
+
     """Gives us a copy of the board so the computer can do some nice testing"""
     def get_board_copy(self, board):
         print(">>Get Board Copy")
@@ -108,7 +105,7 @@ class Othello:
 
         if tiles_to_change == False:
             return False
-        
+
         board[x][y] = tile
         for x, y in tiles_to_change:
             board[x][y] = tile
@@ -141,15 +138,15 @@ class Othello:
     def get_player_move(self):
         x, y = pygame.mouse.get_pos()
         row, column = self.player_click(x, y)
-        # tiles_to_flip = self.is_valid_move(self.board, "player", row, column)
-        # if tiles_to_flip != False:
-        #     for tile in tiles_to_flip:
-        #         x, y = tile
-        #         self.draw_square(x, y, self.c_blue)
-        #         self.board[x][y] = 'player'
+        tiles_to_flip = self.is_valid_move(self.board, "player", row, column)
+        if tiles_to_flip != False:
+            for tile in tiles_to_flip:
+                x, y = tile
+                self.draw_square(x, y, self.c_blue)
+                self.board[x][y] = 'player'
 
-        self.draw_square(row, column, self.c_blue)
-        self.board[row-1][column-1] = "player"
+            self.draw_square(row, column, self.c_blue)
+            self.board[row][column] = "player"
 
     """Not too hard to decipher"""
     def get_random_starter(self):
@@ -171,7 +168,7 @@ class Othello:
                 if self.is_valid_move(board, tile, row, col):
                     valid_moves.append([row, col])
         return valid_moves
-    
+
     """returns True/False depending on whether the row and column are inside/outside the board"""
     def is_on_board(self, row, col):
         return row >= 0 and row <= self.width - 1 and col >= 0 and col <= self.height - 1
@@ -189,7 +186,6 @@ class Othello:
 
         tiles_to_flip = []
         for x_dir, y_dir in [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]]:
-            print("directional loop")
             row, col = row_start, col_start
             row += y_dir
             col += x_dir
@@ -200,14 +196,14 @@ class Othello:
                     while True:
                         col -= x_dir
                         row -= y_dir
-                        if col == row_start and row == col_start:
+                        if col == col_start and row == row_start:
                             break
-                        tiles_to_flip.append([col, row])
+                        tiles_to_flip.append([row, col])
 
         if len(tiles_to_flip) == 0:
             return False
         return tiles_to_flip
-    
+
     """Takes in the mouse x and y position, and divides by a squares len/width to determine which row/column the click occured in"""
     def player_click(self, x, y):
         unit = 1200 / 8
